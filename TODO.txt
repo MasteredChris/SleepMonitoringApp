@@ -1,4 +1,0 @@
-1. Frecce per spostarsi di un giorno
-2. grafico per vedere di settimana in settimana/mese per mese, 
-da abbinare alle frecce
-3.Import/export csv

@@ -26,7 +26,7 @@ const SleepDonutChart: React.FC<SleepDonutChartProps> = ({ record }) => {
     { name: 'Sonno Leggero', value: lightSleep },
   ];
 
-  //Funzione per formattare il tempo in "h min"
+  // Funzione per formattare il tempo in "h min"
   const formatTimeLabel = (value: number) => {
     const hours = Math.floor(value);
     const minutes = Math.round((value - hours) * 60);
@@ -53,7 +53,7 @@ const SleepDonutChart: React.FC<SleepDonutChartProps> = ({ record }) => {
               <Cell key={`cell-${index}`} fill={COLORS[index]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => (value)} />
+          <Tooltip formatter={(value: number) => formatTimeLabel(value)} />
           <Legend 
             verticalAlign="bottom" 
             align="center" 

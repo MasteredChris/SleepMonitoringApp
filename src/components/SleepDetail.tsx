@@ -28,7 +28,7 @@ const SleepDetail: React.FC<SleepDetailProps> = ({ record }) => {
   //const lightSleep = record.duration - (record.deepSleep + record.remSleep + record.awakeTime);
 
   // Formattazione della data per mostrare il "momento" della dormita
-  const formattedDate = new Date(record.date).toLocaleDateString('en-US', {
+  const formattedDate = new Date(record.date).toLocaleDateString('it-IT', {
     weekday: 'long',
     month: 'short',
     day: '2-digit',
@@ -59,7 +59,7 @@ const SleepDetail: React.FC<SleepDetailProps> = ({ record }) => {
         <li><strong>Qualità:</strong> {record.quality.toFixed(2)}%</li>
       </ul>
       <p><strong>Consiglio:</strong> {advice}</p>
-      <SleepDonutChart record={(record)} />
+      <SleepDonutChart record={record} />
     </div>
   );
 };

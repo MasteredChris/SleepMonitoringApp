@@ -29,7 +29,7 @@ const getMonday = (date: Date): string => {
 
 const formatDateTick = (dateStr: string): string => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('it-IT', {
     month: 'short',
     day: '2-digit',
     year: 'numeric'
@@ -38,7 +38,7 @@ const formatDateTick = (dateStr: string): string => {
 
 const formatMonthTick = (monthStr: string): string => {
   const date = new Date(monthStr + "-01");
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('it-IT', {
     month: 'short',
     year: 'numeric'
   }).toLowerCase();
@@ -142,7 +142,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ data }) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="week" hide />
               <YAxis domain={[0, 100]} />
-              <Tooltip formatter={(value: number) => value.toFixed(2)} labelFormatter={formatDateTick} />
+              <Tooltip labelFormatter={formatDateTick} formatter={(value: number) => `${value.toFixed(2)}%`}  />
               <Legend />
               <Line type="monotone" dataKey="quality" stroke="green" activeDot={{ r: 4}} dot={{ r: 0 }} />
             </LineChart>

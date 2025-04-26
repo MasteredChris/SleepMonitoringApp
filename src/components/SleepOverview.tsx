@@ -1,92 +1,142 @@
-import React, { useState } from 'react';
-import { sleepData } from '../data/sleepData';
-import { calculateSleepQuality } from '../utils/calculateQuality';
-import TrendCharts from './TrendCharts';
+// src/components/SleepOverview.tsx
+
+import React, { useState, useEffect } from 'react';
+import Papa from 'papaparse';
+import { calculateSleepQuality } from '../utils/calculateSleepQuality';
+import TrendPerYear from './TrendPerYear';
 import SleepDetail from './SleepDetail';
 import DetailedTrendChart from './DetailedTrendChart';
 
-interface SleepRecordWithQuality {
+export interface AggregatedSleepData {
   id: number;
-  date: string;     // Formato "YYYY-MM-DD"
-  duration: number;
-  deepSleep: number;
-  remSleep: number;
-  awakeTime: number;
-  quality: number;
-  lightSleep:number;
+  date: string;      // "YYYY-MM-DD"
+  duration: number;  // in ore
+  deepSleep: number; // in ore
+  remSleep: number;  // in ore
+  awakeTime: number; // in ore
+  lightSleep: number;// in ore
+  quality: number;   // % qualità
 }
 
-// Assicurati che i dati siano ordinati cronologicamente
-const sortedData: SleepRecordWithQuality[] = sleepData
-  .map(record => ({
-    ...record,
-    quality: calculateSleepQuality(record)
-  }))
-  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
 const SleepOverview: React.FC = () => {
-  // Selezioniamo di default l'ultima data (la più recente)
-  const [selectedDate, setSelectedDate] = useState<string>(
-    sortedData[sortedData.length - 1]?.date || ''
-  );
+  const [aggregatedData, setAggregatedData] = useState<AggregatedSleepData[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>('');
 
-  // Trova il record corrispondente alla data selezionata
-  const selectedRecord = sortedData.find(record => record.date === selectedDate);
+  useEffect(() => {
+    fetch('/src/data/4-sleep_data_2025-02-11.csv')
+      .then(res => res.text())
+      .then(csvText => {
+        Papa.parse<string[]>(csvText, {
+          delimiter: ',',
+          header: false,
+          dynamicTyping: true,
+          complete: ({ data: raw }) => {
+            // parse lines: [ "YYYY-MM-DD hh:mm:ss", " stage" ]
+            const records = raw
+              .filter(r => r.length >= 2 && r[0])
+              .map(r => ({
+                timestamp: (r[0] as string).trim(),
+                stage:    (r[1] as string).trim().toLowerCase(),
+              }))
+              // sort by timestamp
+              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
-  // Trova l'indice del record corrente
-  const currentIndex = sortedData.findIndex(record => record.date === selectedDate);
+            // group by day
+            const groups: Record<string, typeof records> = {};
+            records.forEach(r => {
+              const day = r.timestamp.split(' ')[0];
+              if (!groups[day]) groups[day] = [];
+              groups[day].push(r);
+            });
 
-  // Controlliamo se esiste un record precedente o successivo
-  const hasPrev = currentIndex > 0;
-  const hasNext = currentIndex < sortedData.length - 1;
+            // aggregate per day
+            const agg: AggregatedSleepData[] = [];
+            let id = 1;
+            Object.entries(groups).forEach(([day, recs]) => {
+              if (recs.length < 2) return;
+              const t0 = new Date(recs[0].timestamp);
+              const tN = new Date(recs[recs.length - 1].timestamp);
+              const totalDuration = (tN.getTime() - t0.getTime()) / (1000 * 60 * 60);
 
-  // Funzioni per passare al giorno precedente o successivo
-  const goToPreviousDay = () => {
-    if (hasPrev) {
-      setSelectedDate(sortedData[currentIndex - 1].date);
-    }
-  };
+              let deep = 0, rem = 0, awake = 0;
+              for (let i = 0; i < recs.length - 1; i++) {
+                const curr = new Date(recs[i].timestamp);
+                const next = new Date(recs[i + 1].timestamp);
+                const diffH = (next.getTime() - curr.getTime()) / (1000 * 60 * 60);
+                switch (recs[i].stage) {
+                  case 'deep': deep   += diffH; break;
+                  case 'rem':  rem    += diffH; break;
+                  case 'awake':awake += diffH; break;
+                  // 'light' is derived below
+                }
+              }
 
-  const goToNextDay = () => {
-    if (hasNext) {
-      setSelectedDate(sortedData[currentIndex + 1].date);
-    }
-  };
+              const light = totalDuration - (deep + rem + awake);
+              const quality = calculateSleepQuality({
+                duration: totalDuration,
+                deepSleep: deep,
+                remSleep:  rem,
+                awakeTime: awake,
+              });
+
+              agg.push({
+                id:         id++,
+                date:       day,
+                duration:   parseFloat(totalDuration.toFixed(2)),
+                deepSleep:  parseFloat(deep.toFixed(2)),
+                remSleep:   parseFloat(rem.toFixed(2)),
+                awakeTime:  parseFloat(awake.toFixed(2)),
+                lightSleep: parseFloat(light.toFixed(2)),
+                quality,
+              });
+            });
+
+            agg.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            setAggregatedData(agg);
+            if (agg.length > 0) {
+              setSelectedDate(agg[agg.length - 1].date);
+            }
+          }
+        });
+      })
+      .catch(err => console.error('Errore caricamento CSV:', err));
+  }, []);
+
+  // selected record & navigation
+  const selectedRecord = aggregatedData.find(r => r.date === selectedDate);
+  const idx = aggregatedData.findIndex(r => r.date === selectedDate);
+  const hasPrev = idx > 0;
+  const hasNext = idx < aggregatedData.length - 1;
+
+  const goPrev = () => { if (hasPrev) setSelectedDate(aggregatedData[idx - 1].date); };
+  const goNext = () => { if (hasNext) setSelectedDate(aggregatedData[idx + 1].date); };
 
   return (
-    <div>
+    <div className="sleep-overview">
       <h2>Seleziona una data</h2>
-      {/* Input di tipo date per scegliere la data manualmente */}
       <input
         type="date"
         value={selectedDate}
-        onChange={(e) => setSelectedDate(e.target.value)}
-        min={sortedData[0]?.date}
-        max={sortedData[sortedData.length - 1]?.date}
+        onChange={e => setSelectedDate(e.target.value)}
+        min={aggregatedData[0]?.date}
+        max={aggregatedData[aggregatedData.length - 1]?.date}
       />
-
-      {/* Pulsanti per spostarsi al giorno precedente/successivo */}
       <div style={{ margin: '10px 0' }}>
-        <button onClick={goToPreviousDay} disabled={!hasPrev}>
-          Precedente
-        </button>
-        <button onClick={goToNextDay} disabled={!hasNext} style={{ marginLeft: '10px' }}>
-          Successivo
-        </button>
+        <button onClick={goPrev} disabled={!hasPrev}>Precedente</button>
+        <button onClick={goNext} disabled={!hasNext} style={{ marginLeft: 8 }}>Successivo</button>
       </div>
 
       {selectedRecord ? (
-        //Dettagli della dormita
         <SleepDetail record={selectedRecord} />
       ) : (
-        <div className="sleep-detail">
-          <p>Dati non disponibili per quella data</p>
-        </div>
+        <div className="sleep-detail"><p>Dati non disponibili per quella data</p></div>
       )}
 
+      {/* Andamento giorno per giorno */}
+      <DetailedTrendChart data={aggregatedData} />
 
-      <DetailedTrendChart data={sortedData} />
-      <TrendCharts data={sortedData} />
+      {/* Trend settimanale/mensile su anno */}
+      <TrendPerYear data={aggregatedData} />
     </div>
   );
 };

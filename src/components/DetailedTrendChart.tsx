@@ -91,7 +91,7 @@ const DetailedTrendBarChart: React.FC<Props> = ({ data }) => {
     if (viewMode === 'weekly') {
       // 0=Sun, 1=Mon, ...
       // Puoi fare un array di short day name o usare toLocaleString in UTC
-      const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const dayNames = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
       return dayNames[date.getUTCDay()];
     } else {
       // Ritorna il numero del giorno del mese in UTC
@@ -128,7 +128,7 @@ const DetailedTrendBarChart: React.FC<Props> = ({ data }) => {
   };
 
   function formatMonthUTC(date: Date): string {
-    return date.toLocaleString('en-US', {
+    return date.toLocaleString('it-IT', {
       timeZone: 'UTC',
       month: 'long',
       year: 'numeric'
@@ -136,7 +136,7 @@ const DetailedTrendBarChart: React.FC<Props> = ({ data }) => {
   }
 
   function formatDateUTC(date: Date): string {
-    return date.toLocaleString('en-US', {
+    return date.toLocaleString('it-IT', {
       timeZone: 'UTC',   // Forza l'uso del UTC
       day: '2-digit',
       month: 'short',
