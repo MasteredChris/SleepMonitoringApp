@@ -23,7 +23,7 @@ const SleepOverview: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>('');
 
   useEffect(() => {
-    fetch('/src/data/4-sleep_data_2025-02-11.csv')
+    fetch('/src/data/sleep_data.csv')
       .then(res => res.text())
       .then(csvText => {
         Papa.parse<string[]>(csvText, {

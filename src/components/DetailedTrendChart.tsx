@@ -36,7 +36,7 @@ const DetailedTrendBarChart: React.FC<Props> = ({ data }) => {
 
   // 4. Data di inizio periodo
   const [currentPeriodStart, setCurrentPeriodStart] = useState<Date>(() => {
-    return getMondayUTC(latestDate); // se preferisci default "monthly", usa new Date(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 1);
+    return getMondayUTC(latestDate); // se default "monthly", usare new Date(Date.UTC(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 1));
   });
 
   // 5. useEffect: cambia la data di inizio solo quando viewMode cambia
@@ -47,7 +47,7 @@ const DetailedTrendBarChart: React.FC<Props> = ({ data }) => {
       // primo giorno del mese in UTC
       setCurrentPeriodStart(new Date(Date.UTC(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 1)));
     }
-  }, [viewMode]); // NO latestDate nelle dipendenze!
+  }, [viewMode]); 
 
   // -- FUNZIONI HELPER --
 
@@ -89,8 +89,6 @@ const DetailedTrendBarChart: React.FC<Props> = ({ data }) => {
   const xAxisFormatter = (dateStr: string) => {
     const date = parseDateUTC(dateStr);
     if (viewMode === 'weekly') {
-      // 0=Sun, 1=Mon, ...
-      // Puoi fare un array di short day name o usare toLocaleString in UTC
       const dayNames = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
       return dayNames[date.getUTCDay()];
     } else {

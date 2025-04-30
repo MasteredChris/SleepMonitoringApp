@@ -4,14 +4,15 @@ Prerequisiti
 
 Installazione e avvio
     1.Clona il repository
-        git clone https://github.com/MasteredChris/sleep-monitoring-app
-        cd sleep-monitoring-app
+        git clone https://github.com/MasteredChris/SleepMonitoringApp
+        cd SleepMonitoringApp
+	    git checkout v2
 
     2.Installa le dipendenze (includendo React, PapaParse e Recharts)
         npm install
 
     3.Verifica la posizione del file CSV
-        Assicurati che il file 4-sleep_data_2025-02-11.csv sia in src/data/.
+        Assicurati che il file sleep_data.csv sia in src/data/.
 
     4.Controlla che le Librerie siano le seguenti:
         Librerie necessarie:
