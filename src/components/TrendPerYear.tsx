@@ -44,7 +44,7 @@ const formatMonthTick = (monthStr: string): string => {
   }).toLowerCase();
 };
 
-const TrendCharts: React.FC<TrendChartsProps> = ({ data }) => {
+const TrendPerYear: React.FC<TrendChartsProps> = ({ data }) => {
   if (data.length === 0) return null;
 
   // Estrae gli anni disponibili
@@ -169,4 +169,4 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ data }) => {
   );
 };
 
-export default TrendCharts;
+export default TrendPerYear;

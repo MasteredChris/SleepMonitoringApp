@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { sleepData } from '../data/sleepData';
 import { calculateSleepQuality } from '../utils/calculateQuality';
-import TrendCharts from './TrendCharts';
+import TrendPerYear from './TrendPerYear';
 import SleepDetail from './SleepDetail';
 import DetailedTrendChart from './DetailedTrendChart';
 
@@ -86,7 +86,7 @@ const SleepOverview: React.FC = () => {
 
 
       <DetailedTrendChart data={sortedData} />
-      <TrendCharts data={sortedData} />
+      <TrendPerYear data={sortedData} />
     </div>
   );
 };
