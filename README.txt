@@ -15,6 +15,8 @@ Installazione e avvio
         Assicurati che il file sleep_data.csv sia in src/data/.
 
     4.Controlla che le Librerie siano le seguenti:
+        npm  list --depth=0
+        
         Librerie necessarie:
         ├── @eslint/js@9.22.0
         ├── @types/papaparse@5.3.15         <----
