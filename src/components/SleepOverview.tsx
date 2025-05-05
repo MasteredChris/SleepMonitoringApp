@@ -56,7 +56,7 @@ const SleepOverview: React.FC = () => {
               if (recs.length < 2) return;
               const t0 = new Date(recs[0].timestamp);
               const tN = new Date(recs[recs.length - 1].timestamp);
-              const totalDuration = (tN.getTime() - t0.getTime()) / (1000 * 60 * 60);
+              const totalDuration = (tN.getTime() - t0.getTime()+1000 * 60) / (1000 * 60 * 60);
 
               let deep = 0, rem = 0, awake = 0;
               for (let i = 0; i < recs.length - 1; i++) {
