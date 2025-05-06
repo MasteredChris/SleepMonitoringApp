@@ -125,7 +125,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ data }) => {
                     {/* Nascondiamo l'asse X perché le date saranno visibili nel tooltip */}
                     <XAxis dataKey="date" hide />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip formatter={(value: number) => value.toFixed(2)} labelFormatter={formatDateTick} />
+                    <Tooltip formatter={(value: number) =>  `${value.toFixed(2)}%`} labelFormatter={formatDateTick} />
                     <Legend />
                     {/* Linea continua e curva */}
                     <Line type="step" dataKey="quality" stroke="purple" activeDot={{ r: 4 }} dot={{ r: 0 }} />
@@ -158,7 +158,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ data }) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" hide />
               <YAxis domain={[0, 100]} />
-              <Tooltip formatter={(value: number) => value.toFixed(2)} labelFormatter={formatMonthTick} />
+              <Tooltip formatter={(value: number) =>  `${value.toFixed(2)}%`} labelFormatter={formatMonthTick} />
               <Legend />
               <Line type="monotone" dataKey="quality" stroke="red" activeDot={{ r: 4}} dot={{ r: 0 }} />
             </LineChart>
